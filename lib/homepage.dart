@@ -1,7 +1,9 @@
 import 'dart:html';
 
 import 'package:flutter/material.dart';
+
 import 'package:portfolio/sections/homescreen.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'animation/entranceFader.dart';
 import 'sections/aboutscreen.dart';
 
@@ -14,8 +16,32 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   Color textColor = Colors.white;
+
+  ScrollController _scrollController =
+      ScrollController(initialScrollOffset: 25.0);
+  ItemScrollController _itemScrollController = ItemScrollController();
+  ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
+
+  final List<String> _sectionsName = ["Home", "About", "Projects", "Contact"];
+
+  void _scroll(int i) {
+    _itemScrollController.scrollTo(index: i, duration: Duration(seconds: 1));
+  }
+
+  Widget sectionWidget(int i) {
+    if (i == 0) {
+      return Homescreen();
+    } else if (i == 1) {
+      return Aboutscreen();
+    } else if (i == 2) {
+      return Container();
+    } else if (i == 3) {
+      return Container();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: MaterialButton(
                 onPressed: () {
-                  print('button Pressed');
+                  _scroll(0);
                 },
                 hoverColor: Colors.red,
                 child: Text(
@@ -53,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: MaterialButton(
                 onPressed: () {
-                  print('button Pressed');
+                  _scroll(1);
                 },
                 hoverColor: Colors.red,
                 child: Text(
@@ -66,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: MaterialButton(
                 onPressed: () {
-                  print('button Pressed');
+                  _scroll(2);
                 },
                 hoverColor: Colors.red,
                 child: Text(
@@ -79,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: MaterialButton(
                 onPressed: () {
-                  print('button Pressed');
+                  _scroll(3);
                 },
                 hoverColor: Colors.red,
                 child: Text(
@@ -107,19 +133,20 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           ],
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Homescreen(),
-              SizedBox(
-                height: 5,
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.white,
-                ),
-              ),
-              Aboutscreen(),
-            ],
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: RawScrollbar(
+            controller: _scrollController,
+            thumbColor: Color(0xFFFF5F1F),
+            thickness: 5.0,
+            child: ScrollablePositionedList.builder(
+                itemScrollController: _itemScrollController,
+                itemPositionsListener: _itemPositionsListener,
+                itemCount: 4,
+                itemBuilder: (context, index) {
+                  return sectionWidget(index);
+                }),
           ),
         ));
   }
